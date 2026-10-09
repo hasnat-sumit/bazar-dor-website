@@ -28,7 +28,7 @@ const Header = () => {
 
                 {/* Right Side: Auth Buttons */}
                 <div className="flex items-center gap-2">
-                    <button className="btn btn-success bg-white border-none text-black hover:bg-gray-100">
+                    <button className="btn btn-success bg-gray-100 shadow-none border-none text-black hover:bg-gray-100">
                         সাইন ইন
                     </button>
                     <button className="btn btn-success bg-green-700 border-none text-white hover:bg-green-800">

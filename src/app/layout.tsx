@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Banner from "@/components/Banner";
 import AllProducts from "@/components/AllProducts";
+import PriceMarquee from "@/components/homepage/PriceMarquee";
+import Footer from "@/components/Footer";
 
 const hindSiliguri = Hind_Siliguri({
   subsets: ["latin", "bengali"],
@@ -27,8 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <main>
           <Header />
+          <PriceMarquee/>
           <Banner />
           <AllProducts />
+          <Footer/>
         </main>
 
         {children}

@@ -6,3 +6,29 @@
 body {
   @apply bg-gray-100;
 }
+
+
+.price-marquee-track {
+  animation: price-marquee-scroll 45s linear infinite;
+  will-change: transform;
+}
+
+.price-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes price-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-marquee-track {
+    animation: none;
+  }
+}
