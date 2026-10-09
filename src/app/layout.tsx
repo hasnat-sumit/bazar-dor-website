@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import Banner from "@/components/Banner";
-import AllProducts from "@/components/AllProducts";
 import PriceMarquee from "@/components/homepage/PriceMarquee";
 import Footer from "@/components/Footer";
 
@@ -27,16 +25,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${hindSiliguri.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Header />
+        <PriceMarquee />
+        
         <main>
-          <Header />
-          <PriceMarquee/>
-          <Banner />
-          <AllProducts />
-          <Footer/>
+          
+          {children}
         </main>
-
-        {children}
-
+        
+        <Footer />
       </body>
     </html>
   );

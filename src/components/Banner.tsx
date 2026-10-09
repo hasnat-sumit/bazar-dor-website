@@ -10,7 +10,7 @@ const Banner = () => {
             <section className="flex flex-col-reverse items-center justify-between gap-6 rounded-2xl border border-gray-200 bg-white px-5 py-6 sm:px-8 md:flex-row md:gap-8 md:px-6 md:py-5">
                 {/* Left content */}
                 <div className="w-full md:flex-1">
-                    <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                    <span className="items-center inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                         {date}
                     </span>
 
