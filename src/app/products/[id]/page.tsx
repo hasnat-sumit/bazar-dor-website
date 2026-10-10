@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -26,27 +27,27 @@ interface ProductDetail {
   markets?: any[];
 }
 
-// Safe formatting helper to prevent undefined/NaN crashes
-function formatBnNumber(num: number | null | undefined, maxDigits = 2) {
+function formatBnNumber(
+  num: number | null | undefined,
+  maxDigits = 2
+) {
   const safeNum = Number(num);
+
   if (!Number.isFinite(safeNum)) {
     return "০";
   }
-  return safeNum.toLocaleString("bn-BD", { maximumFractionDigits: maxDigits });
+
+  return safeNum.toLocaleString("bn-BD", {
+    maximumFractionDigits: maxDigits,
+  });
 }
 
 export default async function ProductDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }> | { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const resolvedParams = params ? await Promise.resolve(params) : {};
-  const id = resolvedParams?.id;
-
-  if (!id) {
-    notFound();
-  }
-
+  const { id } = await params;
   const decodedId = decodeURIComponent(id);
 
   let product: ProductDetail | null = null;
@@ -59,6 +60,7 @@ export default async function ProductDetailPage({
 
     if (res.ok) {
       const result = await res.json();
+
       const list: ProductDetail[] = Array.isArray(result)
         ? result
         : result.products ?? result.data ?? [];
@@ -76,9 +78,10 @@ export default async function ProductDetailPage({
 
     if (!product) {
       const directRes = await fetch(
-        `https://api.api-store.workers.dev/api/bazardor/products/${decodedId}`,
+        `https://api.api-store.workers.dev/api/bazardor/products/${encodeURIComponent(decodedId)}`,
         { next: { revalidate: 300 } }
       );
+
       if (directRes.ok) {
         const directData = await directRes.json();
         product = directData.product ?? directData;
@@ -95,16 +98,19 @@ export default async function ProductDetailPage({
   const todayPrice = Number(product.today ?? 0);
   const yesterdayPrice = Number(product.yesterday ?? 0);
   const diff = todayPrice - yesterdayPrice;
-  const changePercent = yesterdayPrice > 0 ? (diff / yesterdayPrice) * 100 : 0;
+
+  const changePercent =
+    yesterdayPrice > 0 ? (diff / yesterdayPrice) * 100 : 0;
+
   const isIncreased = diff > 0;
   const isDecreased = diff < 0;
 
-  // Map markets using exact API properties ("market", "min", "max")
   const rawMarkets = product.markets ?? [];
+
   let markets: MarketItem[] = rawMarkets.map((m: any) => {
     const min = Number(m.min ?? todayPrice);
     const max = Number(m.max ?? min);
-    const avg = Math.round((min + max) / 2); // Calculate average per market from min & max
+    const avg = Math.round((min + max) / 2);
 
     return {
       marketName: m.market ?? "সদর বাজার",
@@ -115,97 +121,140 @@ export default async function ProductDetailPage({
     };
   });
 
-  // Fallback if no market data is returned from the API
   if (markets.length === 0) {
     const base = todayPrice > 0 ? todayPrice : 60;
+
     markets = [
-      { marketName: "সদর বাজার", division: "ঢাকা", minPrice: Math.round(base * 0.95), maxPrice: Math.round(base * 1.05), avgPrice: base },
-      { marketName: "কারওয়ান বাজার", division: "ঢাকা", minPrice: Math.round(base * 0.92), maxPrice: Math.round(base * 1.02), avgPrice: Math.round(base * 0.97) },
-      { marketName: "গ্রীন মার্কেট, মিরপুর", division: "ঢাকা", minPrice: Math.round(base * 0.96), maxPrice: Math.round(base * 1.08), avgPrice: Math.round(base * 1.02) },
-      { marketName: "আমতলী বাজার", division: "চট্টগ্রাম", minPrice: Math.round(base * 0.90), maxPrice: Math.round(base * 1.00), avgPrice: Math.round(base * 0.95) },
+      {
+        marketName: "সদর বাজার",
+        division: "ঢাকা",
+        minPrice: Math.round(base * 0.95),
+        maxPrice: Math.round(base * 1.05),
+        avgPrice: base,
+      },
+      {
+        marketName: "কারওয়ান বাজার",
+        division: "ঢাকা",
+        minPrice: Math.round(base * 0.92),
+        maxPrice: Math.round(base * 1.02),
+        avgPrice: Math.round(base * 0.97),
+      },
+      {
+        marketName: "গ্রীন মার্কেট, মিরপুর",
+        division: "ঢাকা",
+        minPrice: Math.round(base * 0.96),
+        maxPrice: Math.round(base * 1.08),
+        avgPrice: Math.round(base * 1.02),
+      },
+      {
+        marketName: "আমতলী বাজার",
+        division: "চট্টগ্রাম",
+        minPrice: Math.round(base * 0.9),
+        maxPrice: Math.round(base),
+        avgPrice: Math.round(base * 0.95),
+      },
     ];
   }
 
-  // Find absolute minimum and maximum across all markets
-  const minItem = markets.reduce(
-    (min, curr) => (curr.minPrice < min.minPrice ? curr : min),
-    markets[0]
-  );
-  const maxItem = markets.reduce(
-    (max, curr) => (curr.maxPrice > max.maxPrice ? curr : max),
-    markets[0]
+  const minItem = markets.reduce((min, curr) =>
+    curr.minPrice < min.minPrice ? curr : min
+  , markets[0]);
+
+  const maxItem = markets.reduce((max, curr) =>
+    curr.maxPrice > max.maxPrice ? curr : max
+  , markets[0]);
+
+  const avgCalculated = Math.round(
+    markets.reduce((sum, curr) => sum + curr.avgPrice, 0) /
+      markets.length
   );
 
-  // Overall average price calculation
-  const avgCalculated = Math.round(
-    markets.reduce((sum, curr) => sum + curr.avgPrice, 0) / markets.length
-  );
+  const unit = product.unit === "kg"
+    ? "কেজি"
+    : product.unit || "কেজি";
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-3 sm:px-4 py-5 sm:py-6">
+    <main className="mx-auto w-full max-w-7xl px-3 py-5 sm:px-4 sm:py-6">
       {/* Breadcrumb */}
-      <nav className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 flex items-center gap-1.5 flex-wrap">
-        <Link href="/" className="hover:text-green-700 transition-colors">
+      <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-gray-500 sm:mb-6 sm:text-sm">
+        <Link
+          href="/"
+          className="transition-colors hover:text-green-700"
+        >
           হোম
         </Link>
+
         <span>›</span>
+
         {product.categoryNameBn && (
           <>
             <Link
               href={`/categories/${product.categorySlug || product.category || ""}`}
-              className="hover:text-green-700 transition-colors"
+              className="transition-colors hover:text-green-700"
             >
               {product.categoryNameBn}
             </Link>
             <span>›</span>
           </>
         )}
-        <span className="text-gray-900 font-medium">{product.nameBn}</span>
+
+        <span className="font-medium text-gray-900">
+          {product.nameBn}
+        </span>
       </nav>
 
       {/* Top Header Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:mb-8 sm:p-6 md:flex-row md:items-center">
         <div className="flex items-center gap-3.5 sm:gap-4">
-          <span className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl sm:text-3xl">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl sm:h-16 sm:w-16 sm:text-3xl">
             {product.categoryIcon || product.image || "🛒"}
           </span>
+
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
               {product.nameBn}
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-              প্রতি {product.unit === "kg" ? "কেজি" : product.unit || "কেজি"} · {product.categoryNameBn || "নিত্যপ্রয়োজনীয় পণ্য"}
+
+            <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">
+              প্রতি {unit} · {product.categoryNameBn || "নিত্যপ্রয়োজনীয় পণ্য"}
             </p>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1.5 flex items-center gap-1">
+
+            <p className="mt-1.5 flex items-center gap-1 text-xs text-gray-600 sm:text-sm">
               গতকালের তুলনায় আজ দাম{" "}
               <span
                 className={
                   isIncreased
-                    ? "text-red-600 font-semibold"
+                    ? "font-semibold text-red-600"
                     : isDecreased
-                    ? "text-green-600 font-semibold"
-                    : "text-gray-600"
+                      ? "font-semibold text-green-600"
+                      : "text-gray-600"
                 }
               >
-                {isIncreased ? "বেড়েছে" : isDecreased ? "কমেছে" : "অপরিবর্তিত"}
-              </span>{" "}
-              · {formatBnNumber(Math.abs(diff))} টাকা
+                {isIncreased
+                  ? "বেড়েছে"
+                  : isDecreased
+                    ? "কমেছে"
+                    : "অপরিবর্তিত"}
+              </span>
+              {" "}· {formatBnNumber(Math.abs(diff))} টাকা
             </p>
           </div>
         </div>
 
-        {/* Right side price box */}
-        <div className="w-full md:w-auto bg-gray-50 border border-gray-200 rounded-xl p-3.5 sm:p-4 text-center md:text-right shrink-0">
+        {/* Current Price */}
+        <div className="w-full shrink-0 rounded-xl border border-gray-200 bg-gray-50 p-3.5 text-center sm:p-4 md:w-auto md:text-right">
           <p className="text-xs text-gray-500">আজকের দাম</p>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 my-0.5">
+
+          <div className="my-0.5 text-xl font-bold text-gray-900 sm:text-2xl">
             {formatBnNumber(todayPrice)}{" "}
             <span className="text-xs font-normal text-gray-600">
-              টাকা / {product.unit === "kg" ? "কেজি" : product.unit || "কেজি"}
+              টাকা / {unit}
             </span>
           </div>
+
           {changePercent !== 0 && (
             <div
-              className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full mt-1 ${
+              className={`mt-1 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                 isIncreased
                   ? "bg-red-50 text-red-600"
                   : "bg-green-50 text-green-700"
@@ -218,15 +267,16 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      {/* Price Summary Section */}
-      <div className="mb-6 sm:mb-8">
-        <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">
+      {/* Price Summary */}
+      <section className="mb-6 sm:mb-8">
+        <h2 className="mb-3 text-base font-bold text-gray-900 sm:mb-4 sm:text-lg">
           দামের সারাংশ
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <p className="text-xs text-gray-500">সর্বনিম্ন দাম</p>
-            <p className="text-lg sm:text-xl font-bold text-green-700 my-1">
+            <p className="my-1 text-lg font-bold text-green-700 sm:text-xl">
               {formatBnNumber(minItem?.minPrice)} টাকা
             </p>
             <p className="text-xs text-gray-500">
@@ -237,9 +287,9 @@ export default async function ProductDetailPage({
             </p>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <p className="text-xs text-gray-500">সর্বাধিক দাম</p>
-            <p className="text-lg sm:text-xl font-bold text-red-600 my-1">
+            <p className="my-1 text-lg font-bold text-red-600 sm:text-xl">
               {formatBnNumber(maxItem?.maxPrice)} টাকা
             </p>
             <p className="text-xs text-gray-500">
@@ -250,53 +300,59 @@ export default async function ProductDetailPage({
             </p>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <p className="text-xs text-gray-500">গড় দাম</p>
-            <p className="text-lg sm:text-xl font-bold text-gray-900 my-1">
-              {formatBnNumber(todayPrice > 0 ? todayPrice : avgCalculated)} টাকা
+            <p className="my-1 text-lg font-bold text-gray-900 sm:text-xl">
+              {formatBnNumber(
+                todayPrice > 0 ? todayPrice : avgCalculated
+              )} টাকা
             </p>
             <p className="text-xs text-gray-500">
-              প্রতি {product.unit === "kg" ? "কেজি" : product.unit || "কেজি"} -এর হিসেবে
+              প্রতি {unit}-এর হিসেবে
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Market-wise Table Section */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-        <div className="p-4 sm:p-5 border-b border-gray-200">
-          <h2 className="text-base sm:text-lg font-bold text-gray-900">
+      {/* Market-wise Prices */}
+      <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 p-4 sm:p-5">
+          <h2 className="text-base font-bold text-gray-900 sm:text-lg">
             বাজারভিত্তিক আজকের দাম
           </h2>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[600px]">
+          <table className="w-full min-w-[600px] border-collapse text-left">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 text-xs sm:text-sm font-semibold text-gray-600">
-                <th className="py-3 px-4">বাজার</th>
-                <th className="py-3 px-4">বিভাগ</th>
-                <th className="py-3 px-4">সর্বনিম্ন</th>
-                <th className="py-3 px-4">সর্বাধিক</th>
-                <th className="py-3 px-4">গড়</th>
+              <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-600 sm:text-sm">
+                <th className="px-4 py-3">বাজার</th>
+                <th className="px-4 py-3">বিভাগ</th>
+                <th className="px-4 py-3">সর্বনিম্ন</th>
+                <th className="px-4 py-3">সর্বাধিক</th>
+                <th className="px-4 py-3">গড়</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-xs sm:text-sm text-gray-800">
+
+            <tbody className="divide-y divide-gray-100 text-xs text-gray-800 sm:text-sm">
               {markets.map((market, idx) => (
-                <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3.5 px-4 font-medium text-gray-900">
+                <tr
+                  key={`${market.marketName}-${idx}`}
+                  className="transition-colors hover:bg-gray-50"
+                >
+                  <td className="px-4 py-3.5 font-medium text-gray-900">
                     {market.marketName}
                   </td>
-                  <td className="py-3.5 px-4 text-gray-600">
+                  <td className="px-4 py-3.5 text-gray-600">
                     {market.division}
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td className="px-4 py-3.5">
                     {formatBnNumber(market.minPrice)} টাকা
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td className="px-4 py-3.5">
                     {formatBnNumber(market.maxPrice)} টাকা
                   </td>
-                  <td className="py-3.5 px-4 font-semibold">
+                  <td className="px-4 py-3.5 font-semibold">
                     {formatBnNumber(market.avgPrice)} টাকা
                   </td>
                 </tr>
@@ -304,7 +360,7 @@ export default async function ProductDetailPage({
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

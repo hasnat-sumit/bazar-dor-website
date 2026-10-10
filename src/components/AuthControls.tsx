@@ -2,14 +2,13 @@
 "use client";
 
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Avatar,
+  Description,
+  Dropdown,
+  Label,
   Spinner,
 } from "@heroui/react";
 
@@ -60,51 +59,75 @@ const AuthControls = () => {
     );
   }
 
+  const userName = session.user.name || "User";
+  const userEmail = session.user.email || "";
+
+  const initials = userName
+    .trim()
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
-    <Dropdown placement="bottom-end">
-      <DropdownTrigger>
+    <Dropdown>
+      <Dropdown.Trigger>
         <button
           type="button"
           className="flex cursor-pointer items-center gap-2 rounded-xl p-1 hover:bg-gray-100"
         >
           <Avatar
             size="sm"
-            src={session.user.image || undefined}
-            name={session.user.name || "U"}
             className="bg-green-100 font-bold text-green-700"
-          />
+          >
+            {session.user.image ? (
+              <Avatar.Image
+                src={session.user.image}
+                alt={userName}
+              />
+            ) : null}
+            <Avatar.Fallback>{initials || "U"}</Avatar.Fallback>
+          </Avatar>
 
           <div className="hidden text-left sm:block">
             <p className="text-xs font-semibold text-gray-800">
-              {session.user.name}
+              {userName}
             </p>
             <p className="text-[10px] text-gray-500">
-              {session.user.email}
+              {userEmail}
             </p>
           </div>
         </button>
-      </DropdownTrigger>
+      </Dropdown.Trigger>
 
-      <DropdownMenu aria-label="User Actions" variant="flat">
-        <DropdownItem key="profile" isReadOnly>
-          <div>
-            <p className="text-xs font-semibold text-gray-500">
-              লগ ইন অ্যাকাউন্ট
-            </p>
-            <p className="text-xs font-semibold">
-              {session.user.email}
-            </p>
-          </div>
-        </DropdownItem>
-
-        <DropdownItem
-          key="logout"
-          color="danger"
-          onPress={handleSignOut}
+      <Dropdown.Popover placement="bottom end">
+        <Dropdown.Menu
+          aria-label="User actions"
+          onAction={(key) => {
+            if (key === "logout") {
+              void handleSignOut();
+            }
+          }}
         >
-          সাইন আউট
-        </DropdownItem>
-      </DropdownMenu>
+          <Dropdown.Item
+            id="profile"
+            textValue="Logged-in account"
+            isDisabled
+          >
+            <Label>লগ ইন অ্যাকাউন্ট</Label>
+            <Description>{userEmail}</Description>
+          </Dropdown.Item>
+
+          <Dropdown.Item
+            id="logout"
+            textValue="Sign out"
+            variant="danger"
+          >
+            <Label>সাইন আউট</Label>
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown.Popover>
     </Dropdown>
   );
 };
