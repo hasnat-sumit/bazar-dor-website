@@ -58,7 +58,7 @@ export default async function PriceMarquee() {
     if (items.length === 0) return null;
 
     return (
-        <MarqueeText direction="right" duration={10}>
+        <MarqueeText direction="right" duration={15}>
  <div
             className="w-full overflow-hidden border-y border-gray-200 bg-white py-3"
             aria-label="আজকের বাজারদর"
