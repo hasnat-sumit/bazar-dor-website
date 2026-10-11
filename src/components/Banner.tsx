@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -32,7 +31,7 @@ const Banner = () => {
               type="button"
               className="btn btn-sm border-none bg-green-700 px-5 text-white shadow-md hover:bg-green-800 sm:btn-md"
               onClick={() => {
-                router.push("/products");
+                router.push("/allproduct");
               }}
             >
               সব পণ্য দেখুন

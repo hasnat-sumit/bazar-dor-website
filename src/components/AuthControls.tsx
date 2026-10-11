@@ -1,45 +1,104 @@
 
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import {
-  Avatar,
-  Description,
-  Dropdown,
-  Label,
-  Spinner,
-} from "@heroui/react";
+import Link from "next/link";
 
 const AuthControls = () => {
-  const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
-  const handleSignOut = async () => {
-    try {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push("/sign-in");
-            router.refresh();
-          },
-        },
-      });
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
-  };
+  return (
+    <div className="absolute right-4 top-4 flex items-center gap-3 text-sm">
+      {user ? (
+        <Link
+          href="/profile"
+          className="flex items-center gap-2"
+        >
+          <div className="avatar">
+            <div className="ring-primary ring-offset-base-100 w-10 rounded-full ring-2 ring-offset-2">
+              {user.image ? (
+                <img
+                  alt="Profile picture"
+                  src={user.image}
+                />
+              ) : (
+                <div className="flex aspect-square items-center justify-center bg-gray-200 font-semibold">
+                  {user.name?.charAt(0) || "U"}
+                </div>
+              )}
+            </div>
+          </div>
 
-  if (isPending) {
-    return (
-      <div className="flex shrink-0 items-center justify-center p-2">
-        <Spinner size="sm" color="success" />
-      </div>
-    );
-  }
+          <h2>{user.name}</h2>
+        </Link>
+      ) : (
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/sign-in"
+            className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-xl bg-gray-100 px-3 text-xs font-medium text-gray-800 transition-colors hover:bg-gray-200 sm:px-4 sm:text-sm"
+          >
+            সাইন ইন
+          </Link>
 
-  if (!session?.user) {
+          <Link
+            href="/sign-up"
+            className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-xl bg-[#088743] px-3 text-xs font-medium text-white transition-colors hover:bg-green-800 sm:px-4 sm:text-sm"
+          >
+            সাইন আপ
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AuthControls;
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { useRouter } from "next/navigation";
+// import { authClient } from "@/lib/auth-client";
+// import {
+//   Avatar,
+//   Description,
+//   Dropdown,
+//   Label,
+//   Spinner,
+// } from "@heroui/react";
+
+// const AuthControls = () => {
+//   const router = useRouter();
+//   const { data: session, isPending } = authClient.useSession();
+
+//   const handleSignOut = async () => {
+//     try {
+//       await authClient.signOut({
+//         fetchOptions: {
+//           onSuccess: () => {
+//             router.push("/sign-in");
+//             router.refresh();
+//           },
+//         },
+//       });
+//     } catch (error) {
+//       console.error("Sign out error:", error);
+//     }
+//   };
+
+//   if (isPending) {
+//     return (
+//       <div className="flex shrink-0 items-center justify-center p-2">
+//         <Spinner size="sm" color="success" />
+//       </div>
+//     );
+//   }
+
+{/* if (!session?.user) {
     return (
       <div className="flex shrink-0 items-center gap-2">
         <Link
@@ -130,6 +189,5 @@ const AuthControls = () => {
       </Dropdown.Popover>
     </Dropdown>
   );
-};
+}; */}
 
-export default AuthControls;
