@@ -22,45 +22,6 @@
 - **Better Auth** — User authentication and account management.
 - **REST API** — Fetching product, category, and market-price information.
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-Make sure you have the following installed:
-
-- Node.js
-- npm
-- Git
-
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone YOUR_REPOSITORY_URL
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
-   cd YOUR_PROJECT_DIRECTORY
-   ```
-
-3. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-4. Configure the environment variables required by your application in a `.env.local` file.
-
-5. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Overview
 
