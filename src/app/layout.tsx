@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import PriceMarquee from "@/components/homepage/PriceMarquee";
 import Footer from "@/components/Footer";
+import { Toaster } from "react-hot-toast";
 
 const hindSiliguri = Hind_Siliguri({
   subsets: ["latin", "bengali"],
@@ -25,16 +26,33 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${hindSiliguri.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        
+
         <Header />
         <PriceMarquee />
-        
+
         <main>
-          
+
           {children}
         </main>
-        
+
         <Footer />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              borderRadius: "12px",
+              background: "#ffffff",
+              color: "#1f2937",
+            },
+            success: {
+              iconTheme: {
+                primary: "#15803d",
+                secondary: "#ffffff",
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );

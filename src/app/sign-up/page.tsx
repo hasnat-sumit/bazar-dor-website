@@ -1,5 +1,5 @@
 "use client";
-
+import toast from "react-hot-toast";
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -33,10 +33,12 @@ export default function SignUpPage() {
       },
       {
         onSuccess: () => {
+          toast.success("আপনার অ্যাকাউন্ট তৈরি হয়েছে!");
           router.push("/");
           router.refresh();
         },
         onError: (ctx) => {
+          toast.error("অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।");
           setError(ctx.error.message || "অ্যাকাউন্ট তৈরি করতে সমস্যা হয়েছে");
           setLoading(false);
         },

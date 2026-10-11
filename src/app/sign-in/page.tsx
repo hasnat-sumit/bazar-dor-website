@@ -1,5 +1,5 @@
 "use client";
-
+import toast from "react-hot-toast";
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -24,11 +24,15 @@ export default function SignInPage() {
       },
       {
         onSuccess: () => {
+          setLoading(false);
+          toast.success("সফলভাবে লগইন হয়েছে!");
           router.push("/");
           router.refresh();
         },
         onError: (ctx) => {
-          setError(ctx.error.message || "ইমেইল বা পাসওয়ার্ড ভুল হয়েছে");
+          const message = ctx.error.message || "ইমেইল বা পাসওয়ার্ড ভুল হয়েছে";
+          setError(message);
+          toast.error(message);
           setLoading(false);
         },
       }
