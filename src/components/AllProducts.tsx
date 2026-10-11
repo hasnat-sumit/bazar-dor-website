@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 type Product = {
@@ -26,20 +27,27 @@ function ProductSection({
   title,
   products,
   type,
+  id,
 }: {
   title: string;
   products: ProductWithChange[];
   type: "increased" | "decreased" | "all";
+  id?: string;
 }) {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="mb-8 sm:mb-10">
-      <h2 className="mb-3 sm:mb-4 flex items-center gap-2 text-base sm:text-lg font-bold text-gray-900">
+    <section
+      id={id}
+      className="mb-8 scroll-mt-24 sm:mb-10"
+    >
+      <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-gray-900 sm:mb-4 sm:text-lg">
         {type !== "all" && (
           <span
             className={
-              type === "increased" ? "text-red-600" : "text-green-600"
+              type === "increased"
+                ? "text-red-600"
+                : "text-green-600"
             }
           >
             {type === "increased" ? "▲" : "▼"}
@@ -48,7 +56,7 @@ function ProductSection({
         {title}
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {products.map((product) => {
           const increased = product.change > 0;
           const decreased = product.change < 0;
@@ -57,46 +65,54 @@ function ProductSection({
             <Link
               key={product.id}
               href={`/products/${product.slug || product.id}`}
-              className="flex min-w-0 flex-col justify-between rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 transition-all duration-200 hover:border-green-300 hover:shadow-md"
+              className="flex min-w-0 flex-col justify-between rounded-xl border border-gray-200 bg-white p-3.5 transition-all duration-200 hover:border-green-300 hover:shadow-md sm:p-4"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl sm:text-2xl">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xl sm:h-12 sm:w-12 sm:text-2xl">
                   {product.categoryIcon || "🛒"}
                 </span>
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="line-clamp-2 text-xs sm:text-sm font-semibold text-gray-900">
+                  <h3 className="line-clamp-2 text-xs font-semibold text-gray-900 sm:text-sm">
                     {product.nameBn}
                   </h3>
-                  <p className="mt-0.5 text-[11px] sm:text-xs text-gray-500">
-                    {product.categoryNameBn || "নিত্যপ্রয়োজনীয় পণ্য"}
+
+                  <p className="mt-0.5 text-[11px] text-gray-500 sm:text-xs">
+                    {product.categoryNameBn ||
+                      "নিত্যপ্রয়োজনীয় পণ্য"}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-3.5 pt-3 border-t border-gray-100 flex items-end justify-between gap-2">
+              <div className="mt-3.5 flex items-end justify-between gap-2 border-t border-gray-100 pt-3">
                 <div>
-                  <p className="text-[10px] sm:text-[11px] text-gray-500">
+                  <p className="text-[10px] text-gray-500 sm:text-[11px]">
                     আজকের দাম
                   </p>
-                  <p className="mt-0.5 text-xs sm:text-sm font-bold text-gray-900">
-                    {formatPrice(product.todayPrice)} টাকা {product.unit ? `/ ${product.unit}` : ''}
+
+                  <p className="mt-0.5 text-xs font-bold text-gray-900 sm:text-sm">
+                    {formatPrice(product.todayPrice)} টাকা
+                    {product.unit ? ` / ${product.unit}` : ""}
                   </p>
                 </div>
 
                 <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] sm:text-xs font-semibold flex items-center gap-0.5 ${increased
+                  className={`flex shrink-0 items-center gap-0.5 rounded-full px-2.5 py-1 text-[10px] font-semibold sm:text-xs ${
+                    increased
                       ? "bg-red-50 text-red-600"
                       : decreased
                         ? "bg-green-50 text-green-700"
                         : "bg-gray-100 text-gray-600"
-                    }`}
+                  }`}
                 >
                   {increased ? "▲ +" : decreased ? "▼ " : ""}
-                  {Math.abs(product.change).toLocaleString("bn-BD", {
-                    minimumFractionDigits: 1,
-                    maximumFractionDigits: 1,
-                  })}
+                  {Math.abs(product.change).toLocaleString(
+                    "bn-BD",
+                    {
+                      minimumFractionDigits: 1,
+                      maximumFractionDigits: 1,
+                    }
+                  )}
                   %
                 </span>
               </div>
@@ -119,6 +135,7 @@ export default async function AllProducts() {
 
     if (res.ok) {
       const result = await res.json();
+
       const rawProducts: Product[] = Array.isArray(result)
         ? result
         : result.products ?? result.data ?? [];
@@ -150,7 +167,10 @@ export default async function AllProducts() {
             change: ((today - yesterday) / yesterday) * 100,
           };
         })
-        .filter((product): product is ProductWithChange => product !== null);
+        .filter(
+          (product): product is ProductWithChange =>
+            product !== null
+        );
     }
   } catch (error) {
     console.error("Failed to fetch products:", error);
@@ -167,7 +187,7 @@ export default async function AllProducts() {
     .slice(0, 6);
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-3 sm:px-4 py-6">
+    <main className="mx-auto w-full max-w-7xl px-3 py-6 sm:px-4">
       <ProductSection
         title="আজ দাম সবচেয়ে বেশি বেড়েছে"
         products={topIncreased}
@@ -181,6 +201,7 @@ export default async function AllProducts() {
       />
 
       <ProductSection
+        id="sob-ponno"
         title="সব পণ্য"
         products={products}
         type="all"

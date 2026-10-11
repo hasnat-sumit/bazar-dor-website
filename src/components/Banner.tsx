@@ -27,15 +27,14 @@ const Banner = () => {
           </p>
 
           <div className="mt-5 flex justify-center md:justify-start">
-            <button
-              type="button"
+
+            <a
+              href="#sob-ponno"
               className="btn btn-sm border-none bg-green-700 px-5 text-white shadow-md hover:bg-green-800 sm:btn-md"
-              onClick={() => {
-                router.push("/allproduct");
-              }}
             >
               সব পণ্য দেখুন
-            </button>
+            </a>
+
           </div>
         </div>
 
