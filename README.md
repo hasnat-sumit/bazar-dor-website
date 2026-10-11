@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# বাজার দর (BazarDor) 🇧🇩
 
-## Getting Started
+### Bangladesh Daily Market Price Tracker
 
-First, run the development server:
+**বাজার দর (BazarDor)** is a web application that helps people in Bangladesh check the latest prices of everyday essentials in one place. It provides an easy way to explore product prices, compare daily price changes, and understand which products are becoming more or less expensive.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **📊 Daily Price Tracking** — View the latest available prices of essential products and compare them with previous prices.
+2. **📈 Price Increase & Decrease Insights** — Explore products with the biggest price increases and decreases to understand daily market trends.
+3. **🛒 Product Categories** — Browse essential commodities by category, including rice, lentils, oil, vegetables, fish, meat, eggs and dairy, and spices.
+4. **🔍 Product Details** — Open individual product pages to view current prices, price changes, and available market-wise price information.
+5. **🔐 User Authentication & Profile Management** — Register, sign in, and manage your profile using the application's authentication system.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js** — React framework for routing, server-side rendering, and application development.
+- **React** — Component-based user interface development.
+- **TypeScript** — Type-safe JavaScript for more maintainable code.
+- **Tailwind CSS** — Responsive styling and UI design.
+- **MongoDB** — Database integration for application data.
+- **Better Auth** — User authentication and account management.
+- **REST API** — Fetching product, category, and market-price information.
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Make sure you have the following installed:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js
+- npm
+- Git
 
-## Deploy on Vercel
+### Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Clone the repository:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   git clone YOUR_REPOSITORY_URL
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd YOUR_PROJECT_DIRECTORY
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Configure the environment variables required by your application in a `.env.local` file.
+
+5. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📁 Project Overview
+
+BazarDor is designed to make market-price information easier to access through a clean, responsive interface. Users can explore essential products, review daily price movements, and navigate to individual product details.
+
+## 🎯 Project Goal
+
+The goal of BazarDor is to improve access to everyday market-price information in Bangladesh and help consumers make more informed purchasing decisions.
+
+---
+
+**Built with ❤️ in Bangladesh 🇧🇩**
